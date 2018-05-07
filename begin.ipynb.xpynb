@@ -1,0 +1,1619 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "163047e9-d8f3-461c-918b-d9f9952e9069"
+      },
+      "source": [
+        "# Intro\n",
+        "\n",
+        "I'm just a beginner who started using `pandas` one week ago and now trying to do some basic data analysis for the first time.  \n",
+        "I would very much like to hear your feedback, comments and improvements to my code."
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "5a21c145-7e2b-4748-a686-9f903cb00742"
+      },
+      "source": [
+        "&nbsp;\n",
+        "\n",
+        "---\n",
+        "\n",
+        "&nbsp;"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "4d9d7af9-74cc-4d8d-9706-a9df415eef0e"
+      },
+      "source": [
+        "# Importing data\n",
+        "\n",
+        "First we'll import the data and check if everything was loaded ok."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "186645f1-8646-4720-8461-2445b041f2a4"
+      },
+      "outputs": [],
+      "source": [
+        "import numpy as np \n",
+        "import pandas as pd \n",
+        "import seaborn as sns\n",
+        "import matplotlib.pyplot as plt\n",
+        "%matplotlib inline\n",
+        "\n",
+        "df = pd.read_csv('../input/data.csv')\n",
+        "df.head()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "0d8e74b7-3799-48f1-bb53-1078cf010e62"
+      },
+      "outputs": [],
+      "source": [
+        "df.shape"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "d846c714-edd8-4b8d-83ac-fcc5824ca4b9"
+      },
+      "source": [
+        "# Exploring the columns\n",
+        "\n",
+        "We'll explore the columns and see if we can modify or drop some of them.  \n",
+        "List of columns to drop will be in `not_needed` list."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "4608d663-4dad-427b-886f-3f561ff970c3"
+      },
+      "outputs": [],
+      "source": [
+        "random_sample = df.take(np.random.permutation(len(df))[:3])\n",
+        "random_sample.T"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "95e87b0c-7d91-4564-a6a7-b0b7c7fafc93"
+      },
+      "outputs": [],
+      "source": [
+        "not_needed = []"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "37ae4fbc-2ffe-4fca-8cd7-8b5bfbe5b2d5"
+      },
+      "source": [
+        "## Action type and combined shot type"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "2e0aa132-a864-4f8f-baab-0874d008a9d8"
+      },
+      "outputs": [],
+      "source": [
+        "print(df['action_type'].unique())\n",
+        "print(df['combined_shot_type'].unique())"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "74004e11-896f-421c-95fb-675eba241bb6"
+      },
+      "source": [
+        "Let's keep both of them."
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "623f9a48-1219-4bf3-9a37-0ffda3275e92"
+      },
+      "source": [
+        "## Game event and game IDs\n",
+        "\n",
+        "`game_event_id` and `game_id` won't be needed:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "ca0589e0-4352-4193-ad61-0a4a3236c797"
+      },
+      "outputs": [],
+      "source": [
+        "not_needed.extend(['game_event_id', 'game_id'])"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "75905823-3b02-4e97-95cd-0f8b0ca8ba8b"
+      },
+      "source": [
+        "## loc_x, loc_y, lat, lon"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "5b6dbf28-75b3-412c-a35b-49eb0513bef3"
+      },
+      "outputs": [],
+      "source": [
+        "sns.set_style('whitegrid')\n",
+        "sns.pairplot(df, vars=['loc_x', 'loc_y', 'lat', 'lon'], hue='shot_made_flag')"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "8a4f81e0-8c6e-455b-9cc3-69425ff2dd90"
+      },
+      "source": [
+        "`loc_x` and `lon` are correlated, also `loc_y` and `lat`, so we'll drop `lon` and `lat`."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "2861ef24-2942-461a-8897-d72b1076de88"
+      },
+      "outputs": [],
+      "source": [
+        "not_needed.extend(['lon', 'lat'])"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "fd319d31-016d-4f0e-8542-3d5b0a731ebf"
+      },
+      "source": [
+        "## Minutes and seconds remaining\n",
+        "\n",
+        "`minutes_remaining` and `seconds_remaining` can be put in one column named `time_remaining`."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "1809316a-4c64-4b0e-8474-90aec8f0ab2d"
+      },
+      "outputs": [],
+      "source": [
+        "df['time_remaining'] = 60 * df.loc[:, 'minutes_remaining'] + df.loc[:, 'seconds_remaining']"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "9a300c45-2664-4e6c-825e-41a6f8f1ec46"
+      },
+      "outputs": [],
+      "source": [
+        "not_needed.extend(['minutes_remaining', 'seconds_remaining'])"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "927e4e2a-5e94-4616-9224-ec83a9d53711"
+      },
+      "source": [
+        "## Period"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "ec5e4506-ff91-4e46-8a02-80fde2162752"
+      },
+      "outputs": [],
+      "source": [
+        "df['period'].unique()"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "ba1eb8e0-8640-40c0-a159-67c3b019ca4b"
+      },
+      "source": [
+        "## Playoffs"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "682835f7-0130-48ec-88fe-bb77a771631a"
+      },
+      "outputs": [],
+      "source": [
+        "df['playoffs'].unique()"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "29b8de12-a57c-41bc-ad8d-0c260bdbfabe"
+      },
+      "source": [
+        "## Shot made flag"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "38e59f2a-c48b-4f8b-87c3-1c8b555cdd80"
+      },
+      "outputs": [],
+      "source": [
+        "df['shot_made_flag'].unique()"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "0201f694-45e8-4586-9117-cc9449a4e1a2"
+      },
+      "source": [
+        "This will be the feature we're looking for, and later we'll split the data based on it."
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "36f377db-56ac-4b05-b5c3-2019c69e6474"
+      },
+      "source": [
+        "## Season\n",
+        "\n",
+        "In `season` column, we'll just keep the year when season started and convert column to integer."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "48bdcf16-ff45-4a8b-9cea-65c50d5182fa"
+      },
+      "outputs": [],
+      "source": [
+        "df['season'] = df['season'].apply(lambda x: x[:4])\n",
+        "df['season'] = pd.to_numeric(df['season'])"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "c5f4a519-1521-448d-8849-fc12f7d1169d"
+      },
+      "source": [
+        "## Shot distance"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "f5ef87a3-3f09-49fc-8c93-9625ad6a81d2"
+      },
+      "outputs": [],
+      "source": [
+        "dist = pd.DataFrame({'true_dist': np.sqrt((df['loc_x']/10)**2 + (df['loc_y']/10)**2), \n",
+        "                     'shot_dist': df['shot_distance']})\n",
+        "dist[:10]"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "17705696-74e0-4ed6-8bf8-b300f0a4d623"
+      },
+      "source": [
+        "Seems like `shot_distance` is just floored distance calculated from x- and y- location of a shot, so we'll use more precise measure and drop floored one."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "f8463203-ad9d-4a98-9105-ebed35d40492"
+      },
+      "outputs": [],
+      "source": [
+        "df['shot_distance_'] = dist['true_dist']\n",
+        "not_needed.append('shot_distance')"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "2d7c6339-7733-4bfa-9105-a561ab04d75a"
+      },
+      "source": [
+        "## Shot type"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "8962c3d9-d273-4b5e-a2a7-7e3075edc4e3"
+      },
+      "outputs": [],
+      "source": [
+        "df['shot_type'].unique()"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "9c699d6f-cda3-488e-bc4c-95ed6a37fd9d"
+      },
+      "source": [
+        "We can create a new column `3pt_goal` which will have values `1` for 3pt goal and `0` for 2pt goal, and then drop `shot_type` column."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "aff06809-3051-4a0e-ad69-14096dde88af"
+      },
+      "outputs": [],
+      "source": [
+        "df['3pt_goal'] = df['shot_type'].str.contains('3PT').astype('int')\n",
+        "not_needed.append('shot_type')"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "299c3d97-b215-4694-8c07-96e31ddb82e4"
+      },
+      "source": [
+        "## Shot zone: range, area, basic"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "b52b1a2d-4dc4-4b73-9a86-a6c5412911e6"
+      },
+      "outputs": [],
+      "source": [
+        "print(df['shot_zone_range'].unique())\n",
+        "print(df['shot_zone_area'].unique())\n",
+        "print(df['shot_zone_basic'].unique())"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "0d841e98-1200-4a20-816f-053e1a7802c2"
+      },
+      "source": [
+        "`shot_zone_range` is just putting `shot_distance` in 5 bins. Don't need it."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "c1430251-398f-4a6f-8799-289d8ae61748"
+      },
+      "outputs": [],
+      "source": [
+        "not_needed.append('shot_zone_range')\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "1eccf959-b348-48e5-8605-f7dc01458ce1"
+      },
+      "source": [
+        "Let's visualize `shot_zone_area` and `shot_zone_basic`.  \n",
+        "We'll put `loc_y = 0` near the top, so right and left sides show correctly in the graph."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "cb40bb62-7d46-4823-84c7-3d817abd4baa"
+      },
+      "outputs": [],
+      "source": [
+        "area_group = df.groupby('shot_zone_area')\n",
+        "basic_group = df.groupby('shot_zone_basic')\n",
+        "\n",
+        "plt.subplots(1, 2, figsize=(15, 7), sharey=True)\n",
+        "colors = list('rgbcmyk')\n",
+        "\n",
+        "plt.subplot(121)\n",
+        "plt.ylim(500, -50)\n",
+        "plt.title('shot_zone_area')\n",
+        "for i, (_, area) in enumerate(area_group):\n",
+        "    plt.scatter(area['loc_x'], area['loc_y'], alpha=0.1, color=colors[i])\n",
+        "    \n",
+        "plt.subplot(122)\n",
+        "plt.ylim(500, -50)\n",
+        "plt.title('shot_zone_basic')\n",
+        "for i, (_, basic) in enumerate(basic_group):\n",
+        "    plt.scatter(basic['loc_x'], basic['loc_y'], alpha=0.1, color=colors[i])\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "2445f70d-478f-4a0d-895a-c41d15672324"
+      },
+      "source": [
+        "## Team ID and name"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "8c3887a5-7e1b-4d06-bbba-0805b154bfbf"
+      },
+      "outputs": [],
+      "source": [
+        "print(df['team_id'].unique())\n",
+        "print(df['team_name'].unique())\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "215adf7f-e64b-40f8-bbc9-95302b930bfb"
+      },
+      "source": [
+        "Those two columns are the same for all entries, so we can drop them."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "be8fd482-0752-4eb9-9130-74e70e428b01"
+      },
+      "outputs": [],
+      "source": [
+        "not_needed.extend(['team_id', 'team_name'])"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "8012e7a6-4d3d-40d5-82c9-52c5bf9d77ca"
+      },
+      "source": [
+        "## Game date\n",
+        "\n",
+        "We'll convert `game_date` to datetime format, and then split it to year, month and weekday (0 = Monday, 6 = Sunday), so it won't be needed anymore."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "3f7cafd8-6ea0-4e42-a3e5-355f3486b628"
+      },
+      "outputs": [],
+      "source": [
+        "df['game_date'] = pd.to_datetime(df['game_date'])\n",
+        "df['game_year'] = df['game_date'].dt.year\n",
+        "df['game_month'] = df['game_date'].dt.month\n",
+        "df['game_day'] = df['game_date'].dt.dayofweek\n",
+        "\n",
+        "not_needed.append('game_date')\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "e284f3a9-5414-45f9-a60b-7e76b5a8c7a9"
+      },
+      "source": [
+        "## Matchup and opponent\n",
+        "\n",
+        "`matchup` and `opponent` columns give as almost the same data - matchup tells us if the game was home or away (depending if it is '@' or 'vs'), so we'll make a new column with that info and then we can drop `matchup` column."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "b47ba58f-1cd3-4a46-9b06-6941d64ae65f"
+      },
+      "outputs": [],
+      "source": [
+        "df['home_game'] = df['matchup'].str.contains('vs.').astype(int)\n",
+        "not_needed.append('matchup')"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "6fefa866-c6af-4c02-a867-d07c7d2f5a3d"
+      },
+      "source": [
+        "## Shot ID\n",
+        "\n",
+        "We can set `shot_id` as index:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "ce7a82d6-cc40-4550-a79a-015d83d73b16"
+      },
+      "outputs": [],
+      "source": [
+        "df.set_index('shot_id', inplace=True)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "258549db-7387-4cd9-bf17-1fe98b203d6a"
+      },
+      "source": [
+        "## Exploring the columns - summary\n",
+        "\n",
+        "Let's finally drop all not needed columns:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "35ae659c-39ac-4203-963f-bf554c63f6d7"
+      },
+      "outputs": [],
+      "source": [
+        "df = df.drop(not_needed, axis=1)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "dcfe86af-5ea9-4248-9433-b4cc50a0ff42"
+      },
+      "outputs": [],
+      "source": [
+        "df.shape"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "e60b5a16-27cd-4eec-92bd-2731f94554b4"
+      },
+      "outputs": [],
+      "source": [
+        "pd.set_option('display.max_columns', None)\n",
+        "random_sample = df.take(np.random.permutation(len(df))[:10])\n",
+        "random_sample.head(10)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "4023a785-a74f-4a51-b0eb-c2e8f9282b10"
+      },
+      "source": [
+        "&nbsp;\n",
+        "\n",
+        "---\n",
+        "\n",
+        "&nbsp;"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "8db32d84-69b0-4ac1-801e-a67e61ca5596"
+      },
+      "source": [
+        "# Splitting the data\n",
+        "\n",
+        "`submission_data` are those shots where we don't know if he scored or not, and shots where we'll test accuracy of our model."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "8f0da930-41eb-4882-a31d-8d6ed5848468"
+      },
+      "outputs": [],
+      "source": [
+        "submission_data = df[df['shot_made_flag'].isnull()]\n",
+        "submission_data = submission_data.drop('shot_made_flag', 1)\n",
+        "submission_data.shape"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "f26a515a-f3d0-4e46-aa0c-1037524532c3"
+      },
+      "outputs": [],
+      "source": [
+        "data = df[df['shot_made_flag'].notnull()]\n",
+        "data.shape"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "9e9f882f-4293-4701-b217-e4d905e3885d"
+      },
+      "source": [
+        "&nbsp;\n",
+        "\n",
+        "---\n",
+        "\n",
+        "&nbsp;"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "8f01d06f-9af0-4ea8-a5a8-0965a8aaec91"
+      },
+      "source": [
+        "# Exploring the data"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "8d11d48e-f8fa-4dcd-9e07-dead204bba3c"
+      },
+      "source": [
+        "## Shot accuracy"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "a82ff773-8118-4f8a-98e1-1df640229529"
+      },
+      "outputs": [],
+      "source": [
+        "sns.countplot(x='shot_made_flag', data=data)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "ee6ca684-e55d-49c2-8bd3-c9927c9e613b"
+      },
+      "outputs": [],
+      "source": [
+        "data['shot_made_flag'].value_counts() / data['shot_made_flag'].shape"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "682c8d4b-b68a-4789-b825-28d092353240"
+      },
+      "source": [
+        "He scores around 45% of his shots.\n",
+        "\n",
+        "Let's see his attempts depending on the seconds to the end of a period:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "765bbd2c-5da2-4a66-bd50-23f02ede84ef"
+      },
+      "outputs": [],
+      "source": [
+        "data['time_remaining'].plot(kind='hist', bins=24, xlim=(720, 0), figsize=(12,6),\n",
+        "                            title='Attempts made over time\\n(seconds to the end of period)')"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "d183ff61-80c8-402a-a249-0ed6e32e2f90"
+      },
+      "source": [
+        "Accuracy of those shots:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "b421c9b8-79b8-4692-b6f5-7dfdce6db834"
+      },
+      "outputs": [],
+      "source": [
+        "time_bins = np.arange(0, 721, 30)\n",
+        "attempts_in_time = pd.cut(data['time_remaining'], time_bins, right=False)\n",
+        "grouped = data.groupby(attempts_in_time)\n",
+        "prec = grouped['shot_made_flag'].mean()\n",
+        "\n",
+        "prec[::-1].plot(kind='bar', figsize=(12, 6), ylim=(0.2, 0.5), \n",
+        "                title='Shot accuracy over time\\n(seconds to the end of period)')"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "a6f8ea28-d327-40cf-b075-f73c665bfafb"
+      },
+      "source": [
+        "Lots of attempts in last 30 seconds, and much worse accuracy than usual. Let's explore that more."
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "daaf90b8-9655-44a1-b1ce-58411fad5db2"
+      },
+      "source": [
+        "## Shots in the last seconds of a period"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "8a5bccb5-c15f-4bc8-af08-02299fd43ee9"
+      },
+      "outputs": [],
+      "source": [
+        "last_30 = data[data['time_remaining'] < 30]\n",
+        "last_30['shot_made_flag'].value_counts() / last_30['shot_made_flag'].shape"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "9e893abc-4502-4111-bbab-b6b57a24c756"
+      },
+      "source": [
+        "In the last 30 seconds he scores only about 33% of his shots. Pressure?\n",
+        "\n",
+        "Let's explore what happens in those last minutes of the game."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "270ea2f3-7830-4ec1-8dd7-cac1dd16b804"
+      },
+      "outputs": [],
+      "source": [
+        "last_2min = data[data['time_remaining'] <= 120]\n",
+        "\n",
+        "last_2min['time_remaining'].plot(kind='hist', bins=30, xlim=(120, 0), figsize=(12,6),\n",
+        "                            title='Attempts made over time\\n(seconds to the end of period)')"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "3f0a85df-7947-40d3-bb7d-88848d5967ca"
+      },
+      "source": [
+        "Ok, this explains things a bit. Plenty of last seconds desperate shots. Let's return to last 30 seconds."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "cc67b885-2a1e-41f9-80a2-9e8c968a1719"
+      },
+      "outputs": [],
+      "source": [
+        "last_30['time_remaining'].plot(kind='hist', bins=10, xlim=(30, 0), figsize=(12,6),\n",
+        "                            title='Attempts made over time\\n(seconds to the end of period)')"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "9efd7a98-54c5-41b3-b27a-5f8fab90fd2c"
+      },
+      "outputs": [],
+      "source": [
+        "last_5sec_misses = data[(data['time_remaining'] <= 5) & (data['shot_made_flag'] == 0)]\n",
+        "last_5sec_scores = data[(data['time_remaining'] <= 5) & (data['shot_made_flag'] == 1)]\n",
+        "\n",
+        "\n",
+        "fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(12,7))\n",
+        "ax1.set_ylim(800, -50)\n",
+        "\n",
+        "sns.regplot(x='loc_x', y='loc_y', data=last_5sec_misses, fit_reg=False, ax=ax1, color='r')\n",
+        "sns.regplot(x='loc_x', y='loc_y', data=last_5sec_scores, fit_reg=False, ax=ax2, color='g')"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "61a1edac-cb63-4aa3-bf82-421f31c6bdaa"
+      },
+      "source": [
+        "In last 5 seconds, there are some desperate shots from far away, plenty of misses from 3pt line, but he misses a lot even from close distance."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "08aaa451-67da-4309-8ed5-387da9c9db22"
+      },
+      "outputs": [],
+      "source": [
+        "last_5sec_close = data[(data['time_remaining'] <= 5) & (data['shot_distance_'] <= 20)]\n",
+        "\n",
+        "last_5sec_close['shot_made_flag'].value_counts() / last_5sec_close['shot_made_flag'].shape"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "63524d2c-6521-40f0-8a48-f04f7792b2cd"
+      },
+      "outputs": [],
+      "source": [
+        "For comparison, accuracy from close distance when there are more than 5 seconds to go:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "ffe2e4e8-9361-4ac9-b152-f88e4ddcdd16"
+      },
+      "outputs": [],
+      "source": [
+        "close_shots = data[(data['time_remaining'] > 5) & (data['shot_distance_'] <= 20)]\n",
+        "\n",
+        "close_shots['shot_made_flag'].value_counts() / close_shots['shot_made_flag'].shape"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "85f2fbfc-b8c7-4e03-98fa-833e5925395e"
+      },
+      "source": [
+        "## Period accuracy\n",
+        "\n",
+        "Number of shots taken in each period:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "b88c5c23-bb8f-4e23-a843-a3c7921bfc79"
+      },
+      "outputs": [],
+      "source": [
+        "plt.figure(figsize=(12,6))\n",
+        "sns.countplot(x=\"period\", hue=\"shot_made_flag\", data=data)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "86ab53ba-cfe4-4b46-af4b-e80759ffb395"
+      },
+      "source": [
+        "Accuracy:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "008f3650-c0cd-4062-8a91-b2dac34adf4d"
+      },
+      "outputs": [],
+      "source": [
+        "period_acc = data['shot_made_flag'].groupby(data['period']).mean()\n",
+        "period_acc.plot(kind='barh', figsize=(12, 6))"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "58e2a871-d7b3-46c6-9057-1bdaec90a8a3"
+      },
+      "source": [
+        "Seems like a period of a game doesn't influence much his accuracy."
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "d14ffa85-982d-4c2f-9caa-7ea697b1c621"
+      },
+      "source": [
+        "## Accuracy depending on shot type"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "7f5e114f-146e-444c-978e-4a7780d112b4"
+      },
+      "source": [
+        "### Combined shot type\n",
+        "\n",
+        "Number of different kinds of shots:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "00f41485-1195-43de-a315-66a3f2f2e756"
+      },
+      "outputs": [],
+      "source": [
+        "plt.figure(figsize=(12,6))\n",
+        "sns.countplot(x=\"combined_shot_type\", hue=\"shot_made_flag\", data=data)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "c2e8dd0e-39c8-4169-a264-0a45f44971d6"
+      },
+      "source": [
+        "Accuracy:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "33dcb156-69e9-4ff4-9bdf-cb1d94a0952d"
+      },
+      "outputs": [],
+      "source": [
+        "shot_type_acc = data['shot_made_flag'].groupby(data['combined_shot_type']).mean()\n",
+        "shot_type_acc.plot(kind='barh', figsize=(12, 6))"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "3a9f4419-9c45-4f33-9e27-870c6fbe9b86"
+      },
+      "source": [
+        "### Action type\n",
+        "\n",
+        "Number of shots:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "feb47781-d8df-4433-afd3-b8f8c1ab708e"
+      },
+      "outputs": [],
+      "source": [
+        "plt.figure(figsize=(12,18))\n",
+        "sns.countplot(y=\"action_type\", hue=\"shot_made_flag\", data=data)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "adc4679e-1459-4ef5-9b8c-a19f17a60ab8"
+      },
+      "source": [
+        "Accuracy:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "241fdf84-2cb5-459d-90fb-4f6603acf497"
+      },
+      "outputs": [],
+      "source": [
+        "action_type = data['shot_made_flag'].groupby(data['action_type']).mean()\n",
+        "action_type.sort_values()\n",
+        "\n",
+        "action_type.sort_values().plot(kind='barh', figsize=(12, 18))"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "c1d3c4da-4f87-469e-b2e8-9b1bc602728d"
+      },
+      "source": [
+        "## Career accuracy\n",
+        "\n",
+        "Number of shots over seasons:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "a176b672-4522-4b07-9e1f-1bc61a35c38b"
+      },
+      "outputs": [],
+      "source": [
+        "plt.figure(figsize=(12,6))\n",
+        "sns.countplot(x=\"season\", hue=\"shot_made_flag\", data=data)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "b315368b-e47a-46b5-ad95-3338bd1b9a8c"
+      },
+      "outputs": [],
+      "source": [
+        "season_acc = data['shot_made_flag'].groupby(data['season']).mean()\n",
+        "season_acc.plot(figsize=(12, 6), title='Accuracy over seasons')"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "ca322612-5b6f-4124-8c9e-9ee0e0172561"
+      },
+      "source": [
+        "Some Wikipedia insight on what happened with season 2013-14, and possible explanation for the big decline in his last seasons:\n",
+        "\n",
+        "*On April 12 [2013], Bryant suffered a **torn Achilles tendon** against the Golden State Warriors, ending his [2012-13] season. (...) Bryant resumed practicing starting in November, after the start of the 2013\u201314 season. (...)  \n",
+        "Bryant resumed playing on December 8 [2013] after missing the season's first 19 games. On December 17, Bryant matched his season high of 21 points in a 96\u201392 win over Memphis, but he suffered a **lateral tibial plateau fracture** in his left knee that was expected to sideline him for six weeks. (...)  \n",
+        "On March 12, 2014, the Lakers **ruled Bryant out for the remainder of the season**, citing his need for more rehab and the limited time remaining in the season.*\n",
+        "\n",
+        "So I guess he never fully recovered from his injuries, at least when it comes to shot accuracy."
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "885ab4dd-7e77-4bdc-ae93-083cad17158a"
+      },
+      "source": [
+        "## Season freshness\n",
+        "\n",
+        "Number of shots each month:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "44d51841-916b-429c-a002-6e74b1602151"
+      },
+      "outputs": [],
+      "source": [
+        "plt.figure(figsize=(12,6))\n",
+        "sns.countplot(x=\"game_month\", hue=\"shot_made_flag\", data=data)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "4aea262b-d5f4-4868-83f0-0c6dd0c06e35"
+      },
+      "source": [
+        "Accuracy:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "37b5875e-329c-4730-8da8-27d31226b1aa"
+      },
+      "outputs": [],
+      "source": [
+        "game_month = data['shot_made_flag'].groupby(data['game_month']).mean()\n",
+        "game_month.plot(kind='barh', figsize=(12, 6))"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "be4e019a-caf5-4902-97e8-c556a4f5ff22"
+      },
+      "source": [
+        "Almost the same performance troughout the season - just slightly worse accuracy at the start (month 10) and at the end (month 6) of the season, but those months have much less games than other months."
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "92e5e692-a3bf-40fb-a853-929cd5c6891c"
+      },
+      "source": [
+        "## Manic Monday\n",
+        "\n",
+        "Month of a year doesn't affect him, but what about weekday?\n",
+        "\n",
+        "Number of shots per weekday:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "c1dcd6c2-ff30-44ef-96f5-a478638be774"
+      },
+      "outputs": [],
+      "source": [
+        "plt.figure(figsize=(12,6))\n",
+        "sns.countplot(x=\"game_day\", hue=\"shot_made_flag\", data=data)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "39d2f641-8149-4e62-9896-5d7e9adedd5f"
+      },
+      "source": [
+        "Accuracy:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "fc118283-e1b6-4d66-84de-26a112bfcea6"
+      },
+      "outputs": [],
+      "source": [
+        "game_day = data['shot_made_flag'].groupby(data['game_day']).mean()\n",
+        "game_day.plot(kind='barh', figsize=(12, 6))"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "a441541b-06ef-4535-85f0-b629a0cc8ba7"
+      },
+      "source": [
+        "Again no noticeable difference."
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "71e1d2c1-ed70-4f5c-bc75-104abbc8926e"
+      },
+      "source": [
+        "## Regular season vs playoffs\n",
+        "\n",
+        "Number of shots:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "e4f33191-c64d-4578-80c8-aec31eb1c49d"
+      },
+      "outputs": [],
+      "source": [
+        "plt.figure(figsize=(12,6))\n",
+        "sns.countplot(x=\"playoffs\", hue=\"shot_made_flag\", data=data)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "558006d9-d4cd-4933-9f96-3c2fada4d289"
+      },
+      "source": [
+        "Accuracy:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "4fd1eb57-26c4-4e69-87e9-d35df64492ee"
+      },
+      "outputs": [],
+      "source": [
+        "playoffs = data['shot_made_flag'].groupby(data['playoffs']).mean()\n",
+        "playoffs.plot(kind='barh', figsize=(12, 2), xlim=(0, 0.50))"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "dac1cf96-7a67-47ae-8358-0b8fe2f5923d"
+      },
+      "source": [
+        "No difference between regular season and playoffs."
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "13883104-3ab7-407d-b834-273c34ebbdae"
+      },
+      "source": [
+        "## Accuracy depending on the shot distance\n",
+        "\n",
+        "First let's create categories of distances, each 3ft long."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "8584b64d-662b-49dc-bcff-9ae85ded6916"
+      },
+      "outputs": [],
+      "source": [
+        "distance_bins = np.append(np.arange(0, 31, 3), 300) \n",
+        "distance_cat = pd.cut(data['shot_distance_'], distance_bins, right=False)\n",
+        "\n",
+        "dist_data = data.loc[:, ['shot_distance_', 'shot_made_flag']]\n",
+        "dist_data['distance_cat'] = distance_cat\n",
+        "\n",
+        "distance_cat.value_counts(sort=False)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "ad220814-6a4d-49c4-ab51-04034b6f236b"
+      },
+      "source": [
+        "Number of shots in each distance category:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "baea83fd-3520-48a6-941d-841cc845c65b"
+      },
+      "outputs": [],
+      "source": [
+        "plt.figure(figsize=(12,6))\n",
+        "sns.countplot(x=\"distance_cat\", hue=\"shot_made_flag\", data=dist_data)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "e6328d87-2e90-4b9d-9b3b-39605c9001e9"
+      },
+      "source": [
+        "Small number of shots in [21, 24) because that's just inside of 3pt line - better to step outside and try going for 3pt.\n",
+        "\n",
+        "Accuracy by distance category:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "364d12fb-c37a-4f78-9c92-a21e964c3c98"
+      },
+      "outputs": [],
+      "source": [
+        "dist_prec = dist_data['shot_made_flag'].groupby(dist_data['distance_cat']).mean()\n",
+        "dist_prec.plot(kind='bar', figsize=(12, 6))"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "61b7761c-6f7e-44bd-95b8-3ef3992848bb"
+      },
+      "source": [
+        "## Accuracy based on shot zones\n",
+        "\n",
+        "For the difference between `shot_zone_area` and `shot_zone_basic` see [here](#Shot-zone:-range,-area,-basic)."
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "54b399d4-d50f-4245-b963-6c4f37baf19a"
+      },
+      "source": [
+        "### Shot zone area\n",
+        "\n",
+        "Number of shots:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "b1214c8f-eab1-4f8d-adf4-423dc0082fa7"
+      },
+      "outputs": [],
+      "source": [
+        "plt.figure(figsize=(12,6))\n",
+        "sns.countplot(x=\"shot_zone_area\", hue=\"shot_made_flag\", data=data)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "8872c279-6df0-4c34-b0ae-9f7f99db57e9"
+      },
+      "source": [
+        "Accuracy:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "1a40d54f-372a-4354-a93f-05366993e84c"
+      },
+      "outputs": [],
+      "source": [
+        "shot_area = data['shot_made_flag'].groupby(data['shot_zone_area']).mean()\n",
+        "shot_area.plot(kind='barh', figsize=(12, 6))"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "67e66022-dbc1-4526-960f-3f8d48c2c704"
+      },
+      "source": [
+        "He's most accurate from the center, but what's interesting is that he's slightly more accurate from the right side."
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "c02e0635-33df-4514-bff7-79d0917655ed"
+      },
+      "source": [
+        "### Shot zone basic\n",
+        "\n",
+        "Number of shots:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "55121a2f-8d09-4165-90c1-3c0470692b02"
+      },
+      "outputs": [],
+      "source": [
+        "plt.figure(figsize=(12,6))\n",
+        "sns.countplot(x=\"shot_zone_basic\", hue=\"shot_made_flag\", data=data)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "a0d7a92a-82d0-47dd-b8ff-48dda990e3ea"
+      },
+      "source": [
+        "Accuracy:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "ebd41c91-f08b-4821-8d16-6983820ba1fa"
+      },
+      "outputs": [],
+      "source": [
+        "shot_basic = data['shot_made_flag'].groupby(data['shot_zone_basic']).mean()\n",
+        "shot_basic.plot(kind='barh', figsize=(12, 6))"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "2a0b9a07-d725-44a3-8d7e-186f90df4353"
+      },
+      "source": [
+        "We have seen that he's more accurate from right-hand side, but when it comes to corners - left corner suits him slightly better."
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "70273ba0-ae47-4f92-9d57-3299be048e1d"
+      },
+      "source": [
+        "## Home game vs away\n",
+        "\n",
+        "Number of shots:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "7aeb7699-bbfb-4a5e-9768-de7cfb3c5a6c"
+      },
+      "outputs": [],
+      "source": [
+        "plt.figure(figsize=(12,6))\n",
+        "sns.countplot(x=\"home_game\", hue=\"shot_made_flag\", data=data)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "1931ac37-7efc-46d3-bdd7-95e6a320079d"
+      },
+      "source": [
+        "Accuracy:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "494c48b5-0d2e-4872-9585-92623bb6c838"
+      },
+      "outputs": [],
+      "source": [
+        "shot_basic = data['shot_made_flag'].groupby(data['home_game']).mean()\n",
+        "shot_basic.plot(kind='barh', figsize=(12, 2))"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "b8bee8bb-edf5-4c0c-9fc5-c7966f6c960b"
+      },
+      "source": [
+        "Slightly more accurate in front of his home crowd."
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "46bb8485-c550-4c54-af73-ddb866bcf68a"
+      },
+      "source": [
+        "## Opponents\n",
+        "\n",
+        "Number of shots:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "df69442c-457d-4072-84d8-313f34c4150a"
+      },
+      "outputs": [],
+      "source": [
+        "plt.figure(figsize=(12,16))\n",
+        "sns.countplot(y=\"opponent\", hue=\"shot_made_flag\", data=data)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "_cell_guid": "63d83cc6-9993-4b3d-8e44-008cb3a65dce"
+      },
+      "source": [
+        "Accuracy:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "c25e2593-78f4-44c2-97fb-b95c529f9f33"
+      },
+      "outputs": [],
+      "source": [
+        "opponent = data['shot_made_flag'].groupby(data['opponent']).mean()\n",
+        "opponent.sort_values().plot(kind='barh', figsize=(12,10))"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "_cell_guid": "9f559988-a398-487c-84b5-c01bee02a2e0"
+      },
+      "outputs": [],
+      "source": [
+        ""
+      ]
+    }
+  ],
+  "metadata": {
+    "_change_revision": 0,
+    "_is_fork": false,
+    "kernelspec": {
+      "display_name": "Python 3",
+      "language": "python",
+      "name": "python3"
+    },
+    "language_info": {
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "file_extension": ".py",
+      "mimetype": "text/x-python",
+      "name": "python",
+      "nbconvert_exporter": "python",
+      "pygments_lexer": "ipython3",
+      "version": "3.5.2"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 0
+}
